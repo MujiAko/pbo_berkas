@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply inline-flex justify-center items-center px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 transition-all shadow-md shadow-indigo-600/30 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+    }
+    .btn-secondary {
+        @apply inline-flex justify-center items-center px-4 py-2 bg-white text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 hover:-translate-y-0.5 transition-all shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2;
+    }
+    .btn-danger {
+        @apply inline-flex justify-center items-center px-4 py-2 bg-rose-600 text-white rounded-xl hover:bg-rose-700 hover:-translate-y-0.5 transition-all shadow-md shadow-rose-600/30 font-medium focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2;
+    }
+    .input-field {
+        @apply w-full border-gray-200 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 px-4 py-2.5 bg-white transition-all hover:border-gray-300;
+    }
+}
