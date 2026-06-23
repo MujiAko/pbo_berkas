@@ -1,6 +1,6 @@
 # PBO Berkas Project
 
-## 👥 Anggota Kelompok
+## Anggota Kelompok
 
 | No | Nama | NIM |
 |----|------|-----|
@@ -10,7 +10,7 @@
 | 4 | Raffy Andreano Pratama | 242502040030 |
 | 5 | Ramzy Fadlil Agusanddawi | 242502040052 |
 
-> 📚 Tugas UAS — Pemrograman Berbasis Objek (PBO) · Semester 4
+> Tugas UAS — Pemrograman Berbasis Objek (PBO) · Semester 4
 
 ---
 
