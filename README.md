@@ -4,7 +4,7 @@
 
 | No | Nama | NIM |
 |----|------|-----|
-| 1 | Ahmad Muqarrobin | 24250204003 |
+| 1 | Ahmad Muqarrobin | 242502040003 |
 | 2 | Akmal Fauzan | 12110078 |
 | 3 | Muhamad Yusuf | 242502040108 |
 | 4 | Raffy Andreano Pratama | 242502040030 |
