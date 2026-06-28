@@ -7,14 +7,14 @@ describe('API Functions', () => {
   });
 
   it('getSuratList fetches data correctly with all params', async () => {
-    const mockData = [{ id: 1, judul: 'Surat A' }];
+    const mockData = { content: [{ id: 1, judul: 'Surat A' }], totalPages: 1, totalElements: 1 };
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockData
     });
 
     const data = await getSuratList('MASUK', 'test', '2024-01-01', '2024-12-31');
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/surat?jenis=MASUK&search=test&startDate=2024-01-01&endDate=2024-12-31');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/surat?jenis=MASUK&search=test&startDate=2024-01-01&endDate=2024-12-31&page=0&size=8&sortField=tanggal&sortDir=desc');
     expect(data).toEqual(mockData);
   });
 

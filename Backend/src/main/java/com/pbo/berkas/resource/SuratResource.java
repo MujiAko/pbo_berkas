@@ -19,6 +19,7 @@ import jakarta.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.List;
+import com.pbo.berkas.model.PagedResponse;
 
 @Path("/api/surat")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,19 +30,23 @@ public class SuratResource {
     SuratRepository suratRepository;
 
     @GET
-    public List<Surat> getAll(
+    public PagedResponse<Surat> getAll(
             @QueryParam("jenis") String jenis, 
             @QueryParam("search") String search,
             @QueryParam("startDate") String startDateStr,
-            @QueryParam("endDate") String endDateStr) {
+            @QueryParam("endDate") String endDateStr,
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("8") int size,
+            @QueryParam("sortField") @DefaultValue("tanggal") String sortField,
+            @QueryParam("sortDir") @DefaultValue("desc") String sortDir) {
         
         LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr) : null;
         LocalDate endDate = (endDateStr != null && !endDateStr.isEmpty()) ? LocalDate.parse(endDateStr) : null;
 
         if (jenis != null && !jenis.isEmpty()) {
-            return suratRepository.findByJenisAndKeyword(jenis, search, startDate, endDate);
+            return suratRepository.findByJenisAndKeyword(jenis, search, startDate, endDate, page, size, sortField, sortDir);
         }
-        return suratRepository.findByKeyword(search, startDate, endDate);
+        return suratRepository.findByKeyword(search, startDate, endDate, page, size, sortField, sortDir);
     }
 
     @POST
@@ -97,9 +102,9 @@ public class SuratResource {
 
         List<Surat> listSurat;
         if (jenis != null && !jenis.isEmpty()) {
-            listSurat = suratRepository.findByJenisAndKeyword(jenis, search, startDate, endDate);
+            listSurat = suratRepository.findByJenisAndKeyword(jenis, search, startDate, endDate, 0, Integer.MAX_VALUE, "tanggal", "desc").content;
         } else {
-            listSurat = suratRepository.findByKeyword(search, startDate, endDate);
+            listSurat = suratRepository.findByKeyword(search, startDate, endDate, 0, Integer.MAX_VALUE, "tanggal", "desc").content;
         }
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
