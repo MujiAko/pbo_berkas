@@ -40,10 +40,15 @@
             sortField = field;
             sortDir = field === 'tanggal' ? 'desc' : 'asc';
         }
+        currentPage = 1;
+        loadData();
     }
 
     function goToPage(p) {
-        if (p >= 1 && p <= totalPages) currentPage = p;
+        if (p >= 1 && p <= totalPages) {
+            currentPage = p;
+            loadData();
+        }
     }
 
     // Visible page numbers (max 5 around current)
