@@ -17,6 +17,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDate;
 import java.util.List;
 
 @Path("/api/surat")
@@ -28,11 +29,19 @@ public class SuratResource {
     SuratRepository suratRepository;
 
     @GET
-    public List<Surat> getAll(@QueryParam("jenis") String jenis, @QueryParam("search") String search) {
+    public List<Surat> getAll(
+            @QueryParam("jenis") String jenis, 
+            @QueryParam("search") String search,
+            @QueryParam("startDate") String startDateStr,
+            @QueryParam("endDate") String endDateStr) {
+        
+        LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr) : null;
+        LocalDate endDate = (endDateStr != null && !endDateStr.isEmpty()) ? LocalDate.parse(endDateStr) : null;
+
         if (jenis != null && !jenis.isEmpty()) {
-            return suratRepository.findByJenisAndKeyword(jenis, search);
+            return suratRepository.findByJenisAndKeyword(jenis, search, startDate, endDate);
         }
-        return suratRepository.findByKeyword(search);
+        return suratRepository.findByKeyword(search, startDate, endDate);
     }
 
     @POST
@@ -77,12 +86,20 @@ public class SuratResource {
     @GET
     @Path("/export/pdf")
     @Produces("application/pdf")
-    public Response exportPdf(@QueryParam("jenis") String jenis, @QueryParam("search") String search) {
+    public Response exportPdf(
+            @QueryParam("jenis") String jenis, 
+            @QueryParam("search") String search,
+            @QueryParam("startDate") String startDateStr,
+            @QueryParam("endDate") String endDateStr) {
+        
+        LocalDate startDate = (startDateStr != null && !startDateStr.isEmpty()) ? LocalDate.parse(startDateStr) : null;
+        LocalDate endDate = (endDateStr != null && !endDateStr.isEmpty()) ? LocalDate.parse(endDateStr) : null;
+
         List<Surat> listSurat;
         if (jenis != null && !jenis.isEmpty()) {
-            listSurat = suratRepository.findByJenisAndKeyword(jenis, search);
+            listSurat = suratRepository.findByJenisAndKeyword(jenis, search, startDate, endDate);
         } else {
-            listSurat = suratRepository.findByKeyword(search);
+            listSurat = suratRepository.findByKeyword(search, startDate, endDate);
         }
 
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {

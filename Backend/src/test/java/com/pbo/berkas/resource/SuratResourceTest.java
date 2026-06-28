@@ -49,4 +49,14 @@ public class SuratResourceTest {
              .statusCode(200)
              .contentType("application/pdf");
     }
+
+    @Test
+    public void testFilterByDateRange() {
+        given()
+          .queryParam("startDate", "2024-01-01")
+          .queryParam("endDate", "2026-12-31")
+          .when().get("/api/surat")
+          .then()
+             .statusCode(200);
+    }
 }

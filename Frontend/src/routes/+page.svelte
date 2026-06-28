@@ -6,6 +6,8 @@
 
     let activeTab = 'SEMUA';
     let searchQuery = '';
+    let startDate = '';
+    let endDate = '';
     let debounceTimer = null;
 
     let suratList = [];
@@ -82,7 +84,7 @@
         selectedIds = [];
         try {
             const jenisFilter = activeTab === 'SEMUA' ? '' : activeTab;
-            suratList = await getSuratList(jenisFilter, searchQuery);
+            suratList = await getSuratList(jenisFilter, searchQuery, startDate, endDate);
         } catch (err) {
             error = 'Gagal menghubungi server. Pastikan backend Quarkus berjalan.';
             console.error(err);
@@ -106,9 +108,14 @@
         loadData();
     }
 
+    function handleDateChange() {
+        currentPage = 1;
+        loadData();
+    }
+
     function handleExportPdf() {
         const jenisFilter = activeTab === 'SEMUA' ? '' : activeTab;
-        window.open(getExportPdfUrl(jenisFilter, searchQuery), '_blank');
+        window.open(getExportPdfUrl(jenisFilter, searchQuery, startDate, endDate), '_blank');
     }
 
     function handleDownloadSingle(id) {
@@ -176,7 +183,15 @@
             </div>
 
             <!-- Right: Search + Export + Tambah -->
-            <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                
+                <!-- Filter Tanggal -->
+                <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                    <input type="date" bind:value={startDate} on:change={handleDateChange} title="Dari Tanggal" class="w-full sm:w-auto py-2 px-2.5 bg-slate-100/80 rounded-xl text-xs sm:text-sm border-none focus:ring-2 focus:ring-indigo-400 transition-all text-slate-500 cursor-pointer" />
+                    <span class="text-slate-400 text-xs font-semibold px-0.5">-</span>
+                    <input type="date" bind:value={endDate} on:change={handleDateChange} title="Sampai Tanggal" class="w-full sm:w-auto py-2 px-2.5 bg-slate-100/80 rounded-xl text-xs sm:text-sm border-none focus:ring-2 focus:ring-indigo-400 transition-all text-slate-500 cursor-pointer" />
+                </div>
+
                 <!-- Search -->
                 <div class="relative flex-1 sm:flex-none">
                     <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">

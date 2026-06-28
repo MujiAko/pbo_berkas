@@ -1,9 +1,11 @@
 const API_URL = 'http://localhost:8080/api/surat';
 
-export async function getSuratList(jenis = '', search = '') {
+export async function getSuratList(jenis = '', search = '', startDate = '', endDate = '') {
     const params = new URLSearchParams();
     if (jenis) params.append('jenis', jenis);
     if (search) params.append('search', search);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
 
     const url = `${API_URL}?${params.toString()}`;
     const res = await fetch(url);
@@ -47,10 +49,12 @@ export async function bulkDeleteSurat(ids) {
     return true;
 }
 
-export function getExportPdfUrl(jenis = '', search = '') {
+export function getExportPdfUrl(jenis = '', search = '', startDate = '', endDate = '') {
     const params = new URLSearchParams();
     if (jenis) params.append('jenis', jenis);
     if (search) params.append('search', search);
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
     return `${API_URL}/export/pdf?${params.toString()}`;
 }
 

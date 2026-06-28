@@ -6,15 +6,15 @@ describe('API Functions', () => {
     global.fetch = vi.fn();
   });
 
-  it('getSuratList fetches data correctly', async () => {
+  it('getSuratList fetches data correctly with all params', async () => {
     const mockData = [{ id: 1, judul: 'Surat A' }];
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockData
     });
 
-    const data = await getSuratList('MASUK', 'test');
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/surat?jenis=MASUK&search=test');
+    const data = await getSuratList('MASUK', 'test', '2024-01-01', '2024-12-31');
+    expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/surat?jenis=MASUK&search=test&startDate=2024-01-01&endDate=2024-12-31');
     expect(data).toEqual(mockData);
   });
 
