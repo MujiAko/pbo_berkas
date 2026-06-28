@@ -36,7 +36,7 @@ public class SuratRepository implements PanacheRepository<Surat> {
 
         sortField = validateSortField(sortField);
         sortDir = validateSortDir(sortDir);
-        query.append(" order by ").append(sortField).append(" ").append(sortDir);
+        query.append(" order by ").append(sortField).append(" ").append(sortDir).append(", id ").append(sortDir);
 
         PanacheQuery<Surat> pQuery = find(query.toString(), params).page(pageIndex, pageSize);
         return new PagedResponse<>(pQuery.list(), pQuery.count(), pQuery.pageCount(), pageIndex);
@@ -64,7 +64,7 @@ public class SuratRepository implements PanacheRepository<Surat> {
 
         sortField = validateSortField(sortField);
         sortDir = validateSortDir(sortDir);
-        query.append(" order by ").append(sortField).append(" ").append(sortDir);
+        query.append(" order by ").append(sortField).append(" ").append(sortDir).append(", id ").append(sortDir);
 
         PanacheQuery<Surat> pQuery = find(query.toString(), params).page(pageIndex, pageSize);
         return new PagedResponse<>(pQuery.list(), pQuery.count(), pQuery.pageCount(), pageIndex);
