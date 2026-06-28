@@ -103,7 +103,7 @@ Script ini akan secara otomatis menembak API dan menambahkan lebih dari 100 sura
 
 - **Frontend:** Edit files under `Frontend/src/`. Vite automatically reloads the page.
 - **Backend:** Edit Java files under `Backend/src/main/java/`. Quarkus dev mode detects changes and recompiles on‑the‑fly.
-- **Database:** The H2 DB is in‑memory; changes are lost when the backend stops. To persist data, edit the `application.properties` file in `Backend/src/main/resources/` and configure a file‑based datasource if needed.
+- **Database:** Aplikasi menggunakan database **SQLite** berbasis file (`berkasdb.sqlite`). Semua perubahan (termasuk data seeder) akan **otomatis tersimpan secara permanen** dan tidak akan hilang meskipun server dimatikan. Konfigurasi ini dapat dilihat pada `application.properties`.
 
 ---
 
