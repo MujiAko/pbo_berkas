@@ -92,7 +92,12 @@ Untuk menjalankan pengujian otomatis di Frontend (Vitest) dan Backend (JUnit 5 +
 npm run test
 ```
 
----
+### Seeding Data / Mengisi Dummy Data
+Jika Anda membutuhkan data palsu dalam jumlah banyak (misal untuk menguji fitur *pagination* atau filter), Anda dapat menjalankan *script seeder* yang tersedia. Pastikan backend server sudah berjalan (`npm run dev`), lalu jalankan perintah ini di terminal baru:
+```bash
+node seed.js
+```
+Script ini akan secara otomatis menembak API dan menambahkan lebih dari 100 surat dengan nomor, keterangan, dan tanggal yang bervariasi (mundur hingga beberapa bulan ke belakang).
 
 ## Development Workflow
 
