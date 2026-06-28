@@ -3,34 +3,81 @@ package com.pbo.berkas.repository;
 import com.pbo.berkas.model.Surat;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import com.pbo.berkas.model.PagedResponse;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 
 @ApplicationScoped
 public class SuratRepository implements PanacheRepository<Surat> {
 
     /**
-     * Mencari surat berdasarkan jenis DAN keyword.
-     * Keyword dicari di kolom: nomorSurat, judul, pihakTerkait, keterangan.
+     * Mencari surat berdasarkan jenis, keyword, dan rentang tanggal (dengan pagination).
      */
-    public List<Surat> findByJenisAndKeyword(String jenis, String keyword) {
+    public PagedResponse<Surat> findByJenisAndKeyword(String jenis, String keyword, LocalDate startDate, LocalDate endDate, int pageIndex, int pageSize, String sortField, String sortDir) {
+        StringBuilder query = new StringBuilder("jenis = :jenis");
+        Map<String, Object> params = new HashMap<>();
+        params.put("jenis", jenis);
+
         if (keyword != null && !keyword.trim().isEmpty()) {
-            String like = "%" + keyword.toLowerCase() + "%";
-            String query = "jenis = ?1 and (lower(nomorSurat) like ?2 or lower(judul) like ?2 or lower(pihakTerkait) like ?2 or lower(keterangan) like ?2) order by tanggal desc";
-            return find(query, jenis, like).list();
+            query.append(" and (lower(nomorSurat) like :keyword or lower(judul) like :keyword or lower(pihakTerkait) like :keyword or lower(keterangan) like :keyword)");
+            params.put("keyword", "%" + keyword.toLowerCase() + "%");
         }
-        return find("jenis = ?1 order by tanggal desc", jenis).list();
+        if (startDate != null) {
+            query.append(" and tanggal >= :startDate");
+            params.put("startDate", startDate);
+        }
+        if (endDate != null) {
+            query.append(" and tanggal <= :endDate");
+            params.put("endDate", endDate);
+        }
+
+        sortField = validateSortField(sortField);
+        sortDir = validateSortDir(sortDir);
+        query.append(" order by ").append(sortField).append(" ").append(sortDir).append(", id ").append(sortDir);
+
+        PanacheQuery<Surat> pQuery = find(query.toString(), params).page(pageIndex, pageSize);
+        return new PagedResponse<>(pQuery.list(), pQuery.count(), pQuery.pageCount(), pageIndex);
     }
 
     /**
-     * Mencari surat dari SEMUA jenis berdasarkan keyword.
-     * Keyword dicari di kolom: nomorSurat, judul, pihakTerkait, keterangan.
+     * Mencari surat dari SEMUA jenis berdasarkan keyword dan rentang tanggal (dengan pagination).
      */
-    public List<Surat> findByKeyword(String keyword) {
+    public PagedResponse<Surat> findByKeyword(String keyword, LocalDate startDate, LocalDate endDate, int pageIndex, int pageSize, String sortField, String sortDir) {
+        StringBuilder query = new StringBuilder("1=1");
+        Map<String, Object> params = new HashMap<>();
+
         if (keyword != null && !keyword.trim().isEmpty()) {
-            String like = "%" + keyword.toLowerCase() + "%";
-            String query = "lower(nomorSurat) like ?1 or lower(judul) like ?1 or lower(pihakTerkait) like ?1 or lower(keterangan) like ?1 order by tanggal desc";
-            return find(query, like).list();
+            query.append(" and (lower(nomorSurat) like :keyword or lower(judul) like :keyword or lower(pihakTerkait) like :keyword or lower(keterangan) like :keyword)");
+            params.put("keyword", "%" + keyword.toLowerCase() + "%");
         }
-        return find("order by tanggal desc").list();
+        if (startDate != null) {
+            query.append(" and tanggal >= :startDate");
+            params.put("startDate", startDate);
+        }
+        if (endDate != null) {
+            query.append(" and tanggal <= :endDate");
+            params.put("endDate", endDate);
+        }
+
+        sortField = validateSortField(sortField);
+        sortDir = validateSortDir(sortDir);
+        query.append(" order by ").append(sortField).append(" ").append(sortDir).append(", id ").append(sortDir);
+
+        PanacheQuery<Surat> pQuery = find(query.toString(), params).page(pageIndex, pageSize);
+        return new PagedResponse<>(pQuery.list(), pQuery.count(), pQuery.pageCount(), pageIndex);
+    }
+
+    private String validateSortField(String sortField) {
+        if (sortField == null || sortField.trim().isEmpty()) return "tanggal";
+        List<String> allowed = List.of("tanggal", "nomorSurat", "judul", "pihakTerkait");
+        return allowed.contains(sortField) ? sortField : "tanggal";
+    }
+
+    private String validateSortDir(String sortDir) {
+        if (sortDir != null && sortDir.equalsIgnoreCase("asc")) return "asc";
+        return "desc";
     }
 }

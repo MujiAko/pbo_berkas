@@ -62,50 +62,48 @@ git clone <repository‑url>
 cd "PBO Berkas"
 ```
 
-### 2. Install Frontend dependencies
+### 2. Install Dependencies
 ```bash
+# Install root dependencies
+npm install
+
+# Install Frontend dependencies
 cd Frontend
 npm install
+cd ..
 ```
 
-### 3. Build / Run the Backend
-The backend ships with a **Maven wrapper** (`apache-maven-3.9.6/bin/mvn.cmd`). No global Maven installation is required.
+### 3. Menjalankan Aplikasi
+Anda tidak perlu repot menyalakan frontend dan backend secara terpisah. Kami sudah menyediakan satu perintah sakti:
 
 ```bash
-cd ../Backend
-.\apache-maven-3.9.6\bin\mvn.cmd quarkus:dev
-```
-This starts Quarkus in **dev mode**:
-- HTTP server listens on **http://localhost:8080**.
-- An in‑memory H2 database is created and pre‑populated with five dummy `Surat` records (see the console output).
-- Live‑coding is enabled – any code change will be hot‑reloaded.
-
-> **Tip:** If you prefer to use a globally installed Maven, you can run `mvn quarkus:dev` instead.
-
----
-
-## Running the Application
-
-1. **Start the backend** (see step 3 above). Keep this terminal open.
-2. **Start the frontend** in a new terminal:
-```bash
-cd Frontend
 npm run dev
 ```
-   The Vite dev server will start and print something like:
-   ```
-   > Local:   http://localhost:5173/
-   > Network: use --host to expose
-   ```
-3. Open your browser and navigate to `http://localhost:5173`. The UI will fetch data from the backend (`http://localhost:8080/api/surat`).
+Perintah ini akan menyalakan Quarkus (Backend) di port 8080 dan Vite (Frontend) di port 5173 secara bersamaan menggunakan *script* kustom.
+
+> **Tip:** Buka browser dan arahkan ke `http://localhost:5173`. Aplikasi otomatis terhubung ke `http://localhost:8080/api/surat`.
 
 ---
+
+## Testing
+
+Untuk menjalankan pengujian otomatis di Frontend (Vitest) dan Backend (JUnit 5 + REST Assured), gunakan satu perintah ini di *root directory*:
+```bash
+npm run test
+```
+
+### Seeding Data / Mengisi Dummy Data
+Jika Anda membutuhkan data palsu dalam jumlah banyak (misal untuk menguji fitur *pagination* atau filter), Anda dapat menjalankan *script seeder* yang tersedia. Pastikan backend server sudah berjalan (`npm run dev`), lalu jalankan perintah ini di terminal baru:
+```bash
+node seed.js
+```
+Script ini akan secara otomatis menembak API dan menambahkan lebih dari 100 surat dengan nomor, keterangan, dan tanggal yang bervariasi (mundur hingga beberapa bulan ke belakang).
 
 ## Development Workflow
 
 - **Frontend:** Edit files under `Frontend/src/`. Vite automatically reloads the page.
 - **Backend:** Edit Java files under `Backend/src/main/java/`. Quarkus dev mode detects changes and recompiles on‑the‑fly.
-- **Database:** The H2 DB is in‑memory; changes are lost when the backend stops. To persist data, edit the `application.properties` file in `Backend/src/main/resources/` and configure a file‑based datasource if needed.
+- **Database:** Aplikasi menggunakan database **SQLite** berbasis file (`berkasdb.sqlite`). Semua perubahan (termasuk data seeder) akan **otomatis tersimpan secara permanen** dan tidak akan hilang meskipun server dimatikan. Konfigurasi ini dapat dilihat pada `application.properties`.
 
 ---
 
@@ -119,15 +117,7 @@ npm run dev
 
 ## Stopping the Application
 
-- **Frontend:** In the terminal where `npm run dev` is running, press `Ctrl+C`.
-- **Backend:** In the terminal where the Quarkus dev server is running (`mvn quarkus:dev`), press `Ctrl+C`. If you started the backend as a background task via the IDE, you can stop it with the task manager (`manage_task` kill) or close the terminal.
-- **Background tasks (IDE):** To stop a background task you can run:
-  ```
-  manage_task Action=kill TaskId=task-73
-  ```
-  (replace with the actual task id shown in your task list).
-
-After stopping both servers, the application is fully deactivated.
+- **Cara Menghentikan:** Cukup tekan `Ctrl+C` pada terminal yang menjalankan `npm run dev`. *Script* bawaan kami akan secara otomatis mematikan proses Frontend dan Backend.
 
 ---
 

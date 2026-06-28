@@ -1,0 +1,16 @@
+{
+  "name": "pbo-berkas-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd Frontend && npm run dev",
+    "dev:backend": "cd Backend && .\\apache-maven-3.9.6\\bin\\mvn.cmd quarkus:dev",
+    "dev": "node start.js",
+    "test:frontend": "cd Frontend && npm run test",
+    "test:backend": "cd Backend && .\\apache-maven-3.9.6\\bin\\mvn.cmd test",
+    "test": "npm run test:backend && npm run test:frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

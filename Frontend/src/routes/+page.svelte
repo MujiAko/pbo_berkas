@@ -6,6 +6,8 @@
 
     let activeTab = 'SEMUA';
     let searchQuery = '';
+    let startDate = '';
+    let endDate = '';
     let debounceTimer = null;
 
     let suratList = [];
@@ -28,30 +30,8 @@
     let currentPage = 1;
     const PAGE_SIZE = 8;
 
-    // Derived: sorted list
-    $: sortedList = [...suratList].sort((a, b) => {
-        let valA = a[sortField] ?? '';
-        let valB = b[sortField] ?? '';
-        if (sortField === 'tanggal') {
-            valA = new Date(valA).getTime();
-            valB = new Date(valB).getTime();
-        } else {
-            valA = valA.toString().toLowerCase();
-            valB = valB.toString().toLowerCase();
-        }
-        if (valA < valB) return sortDir === 'asc' ? -1 : 1;
-        if (valA > valB) return sortDir === 'asc' ? 1 : -1;
-        return 0;
-    });
-
-    // Derived: paginated list
-    $: totalPages = Math.max(1, Math.ceil(sortedList.length / PAGE_SIZE));
-    $: pagedList = sortedList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-
-    // Reset to page 1 when filters change
-    $: if (suratList || searchQuery || activeTab || sortField || sortDir) {
-        currentPage = 1;
-    }
+    let totalPages = 1;
+    let totalElements = 0;
 
     function setSort(field) {
         if (sortField === field) {
@@ -60,10 +40,15 @@
             sortField = field;
             sortDir = field === 'tanggal' ? 'desc' : 'asc';
         }
+        currentPage = 1;
+        loadData();
     }
 
     function goToPage(p) {
-        if (p >= 1 && p <= totalPages) currentPage = p;
+        if (p >= 1 && p <= totalPages) {
+            currentPage = p;
+            loadData();
+        }
     }
 
     // Visible page numbers (max 5 around current)
@@ -82,7 +67,10 @@
         selectedIds = [];
         try {
             const jenisFilter = activeTab === 'SEMUA' ? '' : activeTab;
-            suratList = await getSuratList(jenisFilter, searchQuery);
+            const res = await getSuratList(jenisFilter, searchQuery, startDate, endDate, currentPage - 1, PAGE_SIZE, sortField, sortDir);
+            suratList = res.content || [];
+            totalPages = res.totalPages || 1;
+            totalElements = res.totalElements || 0;
         } catch (err) {
             error = 'Gagal menghubungi server. Pastikan backend Quarkus berjalan.';
             console.error(err);
@@ -106,9 +94,14 @@
         loadData();
     }
 
+    function handleDateChange() {
+        currentPage = 1;
+        loadData();
+    }
+
     function handleExportPdf() {
         const jenisFilter = activeTab === 'SEMUA' ? '' : activeTab;
-        window.open(getExportPdfUrl(jenisFilter, searchQuery), '_blank');
+        window.open(getExportPdfUrl(jenisFilter, searchQuery, startDate, endDate), '_blank');
     }
 
     function handleDownloadSingle(id) {
@@ -127,10 +120,10 @@
     }
 
     function toggleSelectAll(e) {
-        selectedIds = e.target.checked ? pagedList.map(s => s.id) : [];
+        selectedIds = e.target.checked ? suratList.map(s => s.id) : [];
     }
 
-    $: isAllSelected = pagedList.length > 0 && pagedList.every(s => selectedIds.includes(s.id));
+    $: isAllSelected = suratList.length > 0 && suratList.every(s => selectedIds.includes(s.id));
 
     async function handleBulkDelete() {
         if (selectedIds.length === 0) return;
@@ -176,7 +169,15 @@
             </div>
 
             <!-- Right: Search + Export + Tambah -->
-            <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                
+                <!-- Filter Tanggal -->
+                <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                    <input type="date" bind:value={startDate} on:change={handleDateChange} title="Dari Tanggal" class="w-full sm:w-auto py-2 px-2.5 bg-slate-100/80 rounded-xl text-xs sm:text-sm border-none focus:ring-2 focus:ring-indigo-400 transition-all text-slate-500 cursor-pointer" />
+                    <span class="text-slate-400 text-xs font-semibold px-0.5">-</span>
+                    <input type="date" bind:value={endDate} on:change={handleDateChange} title="Sampai Tanggal" class="w-full sm:w-auto py-2 px-2.5 bg-slate-100/80 rounded-xl text-xs sm:text-sm border-none focus:ring-2 focus:ring-indigo-400 transition-all text-slate-500 cursor-pointer" />
+                </div>
+
                 <!-- Search -->
                 <div class="relative flex-1 sm:flex-none">
                     <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +230,7 @@
             </div>
             <span class="text-xs text-slate-400">
                 {#if suratList.length > 0}
-                    {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, sortedList.length)} dari {sortedList.length} surat
+                    {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, totalElements)} dari {totalElements} surat
                 {:else}
                     0 surat
                 {/if}
@@ -310,7 +311,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
-                        {#each pagedList as surat (surat.id)}
+                        {#each suratList as surat (surat.id)}
                             <!-- svelte-ignore a11y_click_events_have_key_events -->
                             <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                             <tr on:click={() => openViewForm(surat)}
@@ -389,7 +390,7 @@
 
             <!-- Mobile: Card list -->
             <div class="sm:hidden divide-y divide-slate-100">
-                {#each pagedList as surat (surat.id)}
+                {#each suratList as surat (surat.id)}
                     <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <button type="button" on:click={() => openViewForm(surat)}
