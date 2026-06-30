@@ -4,11 +4,10 @@
 
 | No | Nama | NIM |
 |----|------|-----|
-| 1 | Ahmad Muqarrobin | 242502040003 |
-| 2 | Akmal Fauzan | 12110078 |
-| 3 | Muhamad Yusuf | 242502040108 |
-| 4 | Raffy Andreano Pratama | 242502040030 |
-| 5 | Ramzy Fadlil Agusanddawi | 242502040052 |
+| 1 | Akmal Fauzan | 12110078 |
+| 2 | Muhamad Yusuf | 242502040108 |
+| 3 | Raffy Andreano Pratama | 242502040030 |
+| 4 | Ramzy Fadlil Agusanddawi | 242502040052 |
 
 > Tugas UAS — Pemrograman Berbasis Objek (PBO) · Semester 4
 
